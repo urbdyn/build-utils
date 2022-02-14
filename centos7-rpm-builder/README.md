@@ -7,6 +7,8 @@ It has the benefit of providing all the needed boiler plate and avoiding the lon
 Our recommended use of it is to build your own container with it to ensure the user/group of the person running the container matches that of the internal container user.
 This means you can easily copy files and mount directories between the host and container without issue.
 
+## Creating container with this container
+
 ```Dockerfile
 FROM urbdyn/centos7-rpm-builder:latest
 
@@ -22,4 +24,19 @@ USER $_USER_ID:$_GROUP_ID
 
 # Install any needed packages here
 # ...
+```
+
+## Running container
+
+```bash
+docker create -it \
+    --user "$_uid:$_gid" \
+    --name "$container_builder_container" \
+    -v "$build_dir/:/home/builder/rpmbuild/" \
+    -e SPEC_FILE_NAME="foobar.spec" \
+    -e PACKAGE_NAME="foobar" \
+    -e PACKAGE_VERSION="1.2.3" \
+    -e PACKAGE_LICENSE="MY LICENSE" \
+    -e PACKAGE_SOURCE="foobar.tar.gz" \
+    "$container_builder_image"
 ```
