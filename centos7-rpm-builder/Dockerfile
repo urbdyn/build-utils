@@ -5,7 +5,9 @@
 FROM centos:7
 
 # Installing tools needed for rpmbuild
-RUN yum install -y rpm-build rpmlint rpmdevtools systemd sudo selinux-policy-devel
+RUN yum install -y rpm-build rpmlint rpmdevtools systemd sudo selinux-policy-devel && \
+    yum clean all && \
+    rm /var/cache/yum/x86_64/7/timedhosts /var/cache/yum/x86_64/7/timedhosts.txt || true
 
 # Copy over helper scripts
 COPY setup_rpm_users /usr/bin/setup_rpm_users

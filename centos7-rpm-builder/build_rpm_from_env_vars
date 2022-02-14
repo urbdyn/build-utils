@@ -55,9 +55,6 @@ function do_run() {
 
     # Split SPEC_FILE_NAMES by ',' for loop
     for SPEC_FILE_NAME in ${SPEC_FILE_NAMES//,/ }; do
-        echo -e "\Running yum-builddep for $SPEC_FILE_NAME:"
-        sudo yum-builddep -y ~/rpmbuild/SPECS/"$SPEC_FILE_NAME"
-
         echo -e "\nBuilding rpm file for $SPEC_FILE_NAME:"
         rpmbuild -ba \
             --define "package_version $PACKAGE_VERSION" \
