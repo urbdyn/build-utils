@@ -3,7 +3,7 @@
 set -e
 
 help_text="
-setup_rpm_user.sh
+setup_rpm_user
 
     Takes two environmental variables (_USER_ID and _GROUP_ID) and creates
     a new user with which is added so the sudo'er list through membership

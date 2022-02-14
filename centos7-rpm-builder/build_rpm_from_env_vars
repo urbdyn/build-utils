@@ -3,7 +3,7 @@
 set -e
 
 help_text="
-build_rpm_from_env_args.sh [COMMAND]
+build_rpm_from_env_args [COMMAND]
 
     When run, this script will run 'rpm-setuptree' followed by 'rpmbuild'
     with all given environmental variables. See below for details and print
@@ -14,14 +14,14 @@ COMMANDS:
     help  - Print this help menu
 
 ENV VARIABLES:
-    SPEC_FILE_NAME   - File name of '.spec' file in ~/rpmbuild/SPECS/ used (REQUIRED)
+    SPEC_FILE_NAMES  - File names of '.spec' file in ~/rpmbuild/SPECS/ used (REQUIRED, comma delimited)
     PACKAGE_NAME     - Provided to 'rpmbuild' as variable: package_name
     PACKAGE_VERSION  - Provided to 'rpmbuild' as variable: package_version
     PACKAGE_LICENSE  - Provided to 'rpmbuild' as variable: package_license
     PACKAGE_SOURCE   - Provided to 'rpmbuild' as variable: package_source
 
 DETECTED VARIABLE VALUES:
-    SPEC_FILE_NAME   - $SPEC_FILE_NAME
+    SPEC_FILE_NAMES   - $SPEC_FILE_NAMES
     PACKAGE_NAME     - $PACKAGE_NAME
     PACKAGE_VERSION  - $PACKAGE_VERSION
     PACKAGE_LICENSE  - $PACKAGE_LICENSE
@@ -44,24 +44,30 @@ function detect_env_var() {
 }
 
 function do_run() {
-    detect_env_var "SPEC_FILE_NAME" true
+    detect_env_var "SPEC_FILE_NAMES" true
     detect_env_var "PACKAGE_NAME"
     detect_env_var "PACKAGE_VERSION"
     detect_env_var "PACKAGE_LICENSE"
     detect_env_var "PACKAGE_SOURCE"
 
-    echo -e "\nBuilding rpm file:"
+    echo -e "\Running rpmdev-setuptree:"
     sudo rpmdev-setuptree
 
-    echo -e "\nBuilding rpm file:"
-    rpmbuild -ba \
-        --define "package_version $PACKAGE_VERSION" \
-        --define "package_name $PACKAGE_NAME" \
-        --define "package_license $PACKAGE_LICENSE" \
-        --define "package_source $PACKAGE_SOURCE" \
-        ~/rpmbuild/SPECS/teds-succession.spec
+    # Split SPEC_FILE_NAMES by ',' for loop
+    for SPEC_FILE_NAME in ${SPEC_FILE_NAMES//,/ }; do
+        echo -e "\Running yum-builddep for $SPEC_FILE_NAME:"
+        sudo yum-builddep -y ~/rpmbuild/SPECS/"$SPEC_FILE_NAME"
 
-    echo -e "\n\nBuild code: $?\n"
+        echo -e "\nBuilding rpm file for $SPEC_FILE_NAME:"
+        rpmbuild -ba \
+            --define "package_version $PACKAGE_VERSION" \
+            --define "package_name $PACKAGE_NAME" \
+            --define "package_license $PACKAGE_LICENSE" \
+            --define "package_source $PACKAGE_SOURCE" \
+            ~/rpmbuild/SPECS/"$SPEC_FILE_NAME"
+
+        echo -e "\n\nBuild code: $?\n"
+    done
 }
 
 function main() {

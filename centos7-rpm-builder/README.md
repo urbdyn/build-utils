@@ -33,7 +33,7 @@ docker create -it \
     --user "$_uid:$_gid" \
     --name "$container_builder_container" \
     -v "$build_dir/:/home/builder/rpmbuild/" \
-    -e SPEC_FILE_NAME="foobar.spec" \
+    -e SPEC_FILE_NAMES="foobar.spec" \
     -e PACKAGE_NAME="foobar" \
     -e PACKAGE_VERSION="1.2.3" \
     -e PACKAGE_LICENSE="MY LICENSE" \
