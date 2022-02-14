@@ -5,11 +5,11 @@
 FROM centos:7
 
 # Installing tools needed for rpmbuild
-RUN yum install -y rpm-build rpmlint rpmdevtools glibc-langpack-en sudo
+RUN yum install -y rpm-build rpmlint rpmdevtools systemd sudo selinux-policy-devel
 
 # Copy over helper scripts
 COPY setup_rpm_users /usr/bin/setup_rpm_users
-COPY build_rpm_in_container /usr/bin/build_rpm_in_container
+COPY build_rpm_from_env_vars /usr/bin/build_rpm_from_env_vars
 
 # Setup commend to run by default
-CMD build_rpm_in_container run
+CMD build_rpm_from_env_vars run
