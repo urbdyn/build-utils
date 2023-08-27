@@ -41,12 +41,35 @@ function do_run() {
     detect_env_var "_USER_ID" true
     detect_env_var "_GROUP_ID" true
 
-    echo "Adding builder user/group ($_USER_ID:$_GROUP_ID)"
-    groupadd -g "$_GROUP_ID" builder
-    useradd -u "$_USER_ID" -g builder builder
-    echo "builder        ALL=(ALL)       NOPASSWD: ALL" >> /etc/sudoers
-    echo "Id for builder:"
-    id builder
+    echo "Adding builder user/group ($_USER_ID:$_GROUP_ID) ..."
+    # Detecting existing user and group
+    set +e
+    existing_group_name="$(getent group "$_GROUP_ID" | cut -d: -f1)"
+    existing_user_name="$(getent passwd "$_USER_ID" | cut -d: -f1)"
+    set -e
+    # Group creation
+    if [ "$existing_group_name" != "" ]; then
+        echo "Skipping creating builder group as group with desired ID $_GROUP_ID already exists: $existing_group_name"
+    else
+        echo "Creating builder group ..."
+        groupadd -g "$_GROUP_ID" builder
+    fi
+    final_group_name="$(getent group "$_GROUP_ID" | cut -d: -f1)"
+    # User creation
+    if [ "$existing_user_name" != "" ]; then
+        echo "Skipping creating builder user as user with desired ID $_USER_ID already exists: $existing_user_name"
+        echo "Attempting to add existing user to group $final_group_name ($_GROUP_ID) ..."
+        usermod -a -G "$final_group_name" "$existing_user_name"
+    else
+        echo "Creating builder user ..."
+        useradd -u "$_USER_ID" -g "$_GROUP_ID" builder
+    fi
+    # Add to sudoers
+    final_user_name="$(getent passwd "$_USER_ID" | cut -d: -f1)"
+    echo "$final_user_name        ALL=(ALL)       NOPASSWD: ALL" >> /etc/sudoers
+
+    echo "Id for container user:"
+    id "$_USER_ID"
 }
 
 function main() {
