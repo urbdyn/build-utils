@@ -19,7 +19,7 @@ ENV _USER_ID ${_USER_ID:-1001}
 ENV _GROUP_ID ${_GROUP_ID:-1002}
 
 # Run script to create users and declare new user as default
-RUN setup_users.sh
+RUN setup_rpm_users
 USER $_USER_ID:$_GROUP_ID
 
 # Install any needed packages here
