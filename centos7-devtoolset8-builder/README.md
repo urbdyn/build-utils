@@ -25,3 +25,15 @@ docker create -it \
     -v "$build_dir/:/TARGET_BUILD_DIR_HERE/" \
     "$container_builder_image"
 ```
+
+## Change Log
+
+### 2023-02-09 (commit `08028c2`)
+
+Commit: https://github.com/urbdyn/build-utils/commit/08028c28122b706e230841b770fa62180b3b11e7
+
+Container: https://github.com/urbdyn/build-utils/pkgs/container/centos7-devtoolset8-builder/69516047
+
+
+Changes:
+1. First release of container.

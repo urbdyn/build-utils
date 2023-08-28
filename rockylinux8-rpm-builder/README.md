@@ -40,3 +40,25 @@ docker create -it \
     -e PACKAGE_SOURCE="foobar.tar.gz" \
     "$container_builder_image"
 ```
+
+
+## Change Log
+
+### 2023-08-28 (commit `a5fff7e`)
+
+Commit: https://github.com/urbdyn/build-utils/commit/a5fff7e71fedb73ff46a1f2a29dfb8ffc69ed56f
+
+Container: https://github.com/urbdyn/build-utils/pkgs/container/rockylinux8-rpm-builder/122657788
+
+Changes:
+1. Updated `setup_rpm_users` script to support if an existing user ID or group ID is given.
+
+
+### 2022-09-07 (commit `2125cc9`)
+
+Commit: https://github.com/urbdyn/build-utils/commit/2125cc9066323547603ffc50a5a273b1b983f627
+
+Container: https://github.com/urbdyn/build-utils/pkgs/container/rockylinux8-rpm-builder/40817769
+
+Changes:
+1. First release of container.
