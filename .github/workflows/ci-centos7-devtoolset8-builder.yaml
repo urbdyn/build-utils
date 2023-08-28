@@ -8,7 +8,7 @@ name: CI for centos7-devtoolset8-builder
 on:
   pull_request:
     branches: ['main']
-    paths: ['!**/*.md', 'centos7-devtoolset8-builder/**']
+    paths: ['centos7-devtoolset8-builder/**', '!**/*.md']
 
 env:
   REGISTRY: ghcr.io
