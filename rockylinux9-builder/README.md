@@ -24,3 +24,12 @@ docker create -it \
     -v "$build_dir/:/TARGET_BUILD_DIR_HERE/" \
     "$container_builder_image"
 ```
+
+### 2025-03-03 (commit `28b50c9`)
+
+Commit: https://github.com/urbdyn/build-utils/commit/28b50c9672af7b37a6e80a2cec5aedf179ca07f4
+
+Container: https://github.com/urbdyn/build-utils/pkgs/container/rockylinux9-builder/366581377
+
+Changes:
+1. First release of container, using Rocky Linux 9.5.
