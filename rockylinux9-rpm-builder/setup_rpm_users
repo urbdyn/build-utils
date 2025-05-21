@@ -1,0 +1,92 @@
+#!/usr/bin/env bash
+
+set -e
+
+help_text="
+setup_rpm_user
+
+    Takes two environmental variables (_USER_ID and _GROUP_ID) and creates
+    a new user with which is added so the sudo'er list through membership
+    in 'builder' group.
+
+COMMANDS:
+    run   - Do the build (details above)
+    help  - Print this help menu
+
+ENV VARIABLES:
+    _USER_ID   - Name of new user to run script for (REQUIRED)
+    _GROUP_ID  - Name of new group to run script for (REQUIRED)
+
+DETECTED VARIABLE VALUES:
+    _USER_ID   - $_USER_ID
+    _GROUP_ID  - $_GROUP_ID
+"
+
+function detect_env_var() {
+    var_name="$1"
+    var_value="${!var_name}"
+    required="$2"
+
+    if [[ "$required" = "true" ]] && [[ "$var_value" = "" ]]; then
+        echo "Required variable '$var_name' not detected! Exiting."
+        exit 1
+    elif [[ "$var_value" = "" ]]; then
+        echo "No value detected for variable '$var_name'"
+    else
+        echo "Value detected for variable '$var_name' = $var_value"   
+    fi
+}
+
+function do_run() {
+    detect_env_var "_USER_ID" true
+    detect_env_var "_GROUP_ID" true
+
+    echo "Adding builder user/group ($_USER_ID:$_GROUP_ID) ..."
+    # Detecting existing user and group
+    set +e
+    existing_group_name="$(getent group "$_GROUP_ID" | cut -d: -f1)"
+    existing_user_name="$(getent passwd "$_USER_ID" | cut -d: -f1)"
+    set -e
+    # Group creation
+    if [ "$existing_group_name" != "" ]; then
+        echo "Skipping creating builder group as group with desired ID $_GROUP_ID already exists: $existing_group_name"
+    else
+        echo "Creating builder group ..."
+        groupadd -g "$_GROUP_ID" builder
+    fi
+    final_group_name="$(getent group "$_GROUP_ID" | cut -d: -f1)"
+    # User creation
+    if [ "$existing_user_name" != "" ]; then
+        echo "Skipping creating builder user as user with desired ID $_USER_ID already exists: $existing_user_name"
+        echo "Attempting to add existing user to group $final_group_name ($_GROUP_ID) ..."
+        usermod -a -G "$final_group_name" "$existing_user_name"
+    else
+        echo "Creating builder user ..."
+        useradd -u "$_USER_ID" -g "$_GROUP_ID" builder
+    fi
+    # Add to sudoers
+    final_user_name="$(getent passwd "$_USER_ID" | cut -d: -f1)"
+    echo "$final_user_name        ALL=(ALL)       NOPASSWD: ALL" >> /etc/sudoers
+
+    echo "Id for container user:"
+    id "$_USER_ID"
+}
+
+function main() {
+    case "$1" in
+        "run")
+            do_run
+            exit 0
+            ;;
+        ""|"help"|"--help"|"-h")
+            echo "$help_text"
+            exit 0
+            ;;
+        *)
+            echo "Command not recognized: $1"
+            exit 1
+            ;;
+    esac
+}
+
+main $@
