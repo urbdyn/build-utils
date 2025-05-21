@@ -44,4 +44,11 @@ docker create -it \
 
 ## Change Log
 
-TODO: Add this after initial PR is merged.
+### 2025-05-21 (commit `b526629`)
+
+Commit: https://github.com/urbdyn/build-utils/commit/b526629c4e9ccb2dea48ca0850df1957adfebd9d
+
+Container: https://github.com/urbdyn/build-utils/pkgs/container/rockylinux9-rpm-builder/421008777
+
+Changes:
+1. First release of container.
